@@ -22,4 +22,5 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version = "2.9.7" }
+kotlin-parcelize = { id = "kotlin-parcelize" }
 
