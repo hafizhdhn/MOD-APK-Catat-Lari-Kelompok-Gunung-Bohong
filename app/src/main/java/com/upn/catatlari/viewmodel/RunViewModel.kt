@@ -1,36 +1,41 @@
 package com.upn.catatlari.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.upn.catatlari.data.RunDatabase
 import com.upn.catatlari.model.Run
+import com.upn.catatlari.repository.RunRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class RunViewModel : ViewModel() {
+// Kita gunakan AndroidViewModel karena kita butuh "application" untuk memanggil Database
+class RunViewModel(application: Application) : AndroidViewModel(application) {
 
-    val runList = listOf(
-        Run(runDate = "22 Mei 2026", runDistance = 1, runDuration = 3),
-        Run(runDate = "23 Mei 2026", runDistance = 1, runDuration = 3),
-        Run(runDate = "24 Mei 2026", runDistance = 1, runDuration = 3)
-    )
+    private val repository: RunRepository
+    // LiveData yang akan dipantau oleh UI (Fragment/Activity)
+    val runHistory: LiveData<List<Run>>
 
-    private val runListLiveData = MutableLiveData(runList) // variabel yang berfungsi mengatur perubahan data
-    var runHistory : LiveData<List<Run>> = runListLiveData // variabel yang dipakai untuk dipanggil class lain
-
-    // CREATE
-    fun addRun(run: Run) {
-//        if (runListLiveData.value == null) {
-//
-//        }
-
-        val currentList = runListLiveData.value.orEmpty().toMutableList()
-        currentList.add(run)
-        runListLiveData.value = currentList
+    init {
+        // Inisialisasi Database, DAO, dan Repository
+        val runDao = RunDatabase.getDatabase(application).runDao()
+        repository = RunRepository(runDao)
+        runHistory = repository.allRuns
     }
 
-    // READ
+    // Fungsi Tambah Data (Create)
+    fun addRun(run: Run) = viewModelScope.launch(Dispatchers.IO) {
+        repository.insert(run)
+    }
 
-    // UPDATE
+    // Fungsi Update Data (Update)
+    fun updateRun(run: Run) = viewModelScope.launch(Dispatchers.IO) {
+        repository.update(run)
+    }
 
-    // DELETE
-
+    // Fungsi Hapus Data (Delete)
+    fun deleteRun(run: Run) = viewModelScope.launch(Dispatchers.IO) {
+        repository.delete(run)
+    }
 }
