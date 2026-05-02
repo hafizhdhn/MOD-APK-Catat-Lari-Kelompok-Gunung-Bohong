@@ -6,14 +6,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.upn.catatlari.databinding.ItemRunBinding
 import com.upn.catatlari.model.Run
 
-class RunAdapter() : RecyclerView.Adapter<RunAdapter.RunViewHolder>() {
+class RunAdapter(private val onDeleteClick: (Run) -> Unit) : RecyclerView.Adapter<RunAdapter.RunViewHolder>() {
 
     private var runList = mutableListOf<Run>()
 
     fun setData(runItems: List<Run>) {
         runList.clear()
         runList.addAll(runItems)
+        notifyDataSetChanged()
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RunViewHolder =
         RunViewHolder(ItemRunBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
@@ -25,7 +27,11 @@ class RunAdapter() : RecyclerView.Adapter<RunAdapter.RunViewHolder>() {
         fun bind(run: Run) {
             binding.txtRunDate.text = run.runDate
             binding.txtRunDistance.text = "${run.runDistance} KM"
-            binding.txtRunDuration.text = "${run.runDuration.toString()} Menit"
+            binding.txtRunDuration.text = "${run.runDuration} Menit"
+
+            binding.btnDeleteRun.setOnClickListener {
+                onDeleteClick(run)
+            }
         }
     }
 }
