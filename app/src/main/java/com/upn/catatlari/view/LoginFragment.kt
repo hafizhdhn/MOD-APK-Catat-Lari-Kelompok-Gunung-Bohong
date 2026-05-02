@@ -14,11 +14,14 @@ import com.upn.catatlari.databinding.FragmentLoginBinding
 import com.upn.catatlari.viewmodel.UserViewModel
 
 class LoginFragment : Fragment() {
-
+    // Menghubungkan layout XML dengan kode Kotlin (ViewBinding)
     private lateinit var loginBinding: FragmentLoginBinding
+
+    //Menginisialisasi ViewModel untuk memproses data user
     private val userViewModel: UserViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        // Mengubah layout XML menjadi objek tampilan (view)
         loginBinding = FragmentLoginBinding.inflate(inflater, container, false)
         return loginBinding.root
     }
@@ -40,10 +43,12 @@ class LoginFragment : Fragment() {
             }
         }
 
+        //Event saat tombol login diklik
         loginBinding.buttonLogin.setOnClickListener {
             val emailUser = loginBinding.etEmail.text.toString()
             val passwordUser = loginBinding.etPassword.text.toString()
 
+            //Validasi input agar tidak kosong
             if (emailUser.isEmpty() || passwordUser.isEmpty()) {
                 Toast.makeText(requireContext(), "Silahkan masukkan email/password!", Toast.LENGTH_SHORT).show()
             } else {

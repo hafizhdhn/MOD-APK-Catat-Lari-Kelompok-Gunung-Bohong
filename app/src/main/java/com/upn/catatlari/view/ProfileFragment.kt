@@ -11,7 +11,7 @@ import com.upn.catatlari.R
 import com.upn.catatlari.databinding.FragmentProfileBinding
 
 class ProfileFragment : Fragment() {
-
+    // Menghubungkan layout XML fragment_profile dengan kode Kotlin
     private lateinit var binding: FragmentProfileBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -28,10 +28,11 @@ class ProfileFragment : Fragment() {
         // TODO: Tampilkan nama user jika ada TextView di layout
         // binding.txtUserName.text = user?.name
 
+        // Navigasi ke halaman Edit Profile
         binding.btnEditProfile.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
         }
-
+        // Logika Logout untuk keluar dari aplikasi
         binding.btnLogout.setOnClickListener { 
             // Pindah ke AuthActivity (Halaman Login/Welcome)
             val intent = Intent(requireContext(), AuthActivity::class.java)

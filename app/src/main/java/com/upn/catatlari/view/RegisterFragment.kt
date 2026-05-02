@@ -13,8 +13,9 @@ import com.upn.catatlari.model.User
 import com.upn.catatlari.viewmodel.UserViewModel
 
 class RegisterFragment : Fragment() {
-
+    // Menghubungkan layout XML fragment_register dengan kode Kotlin
     private lateinit var binding: FragmentRegisterBinding
+    // Menginisialisasi ViewModel untuk memproses logika pendaftaran user
     private val userViewModel: UserViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -28,13 +29,15 @@ class RegisterFragment : Fragment() {
         // Observasi hasil pendaftaran
         userViewModel.registrationSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
+                // Jika sukses: Tampilkan pesan dan kembali ke halaman Login
                 Toast.makeText(requireContext(), "Registrasi Berhasil! Silakan Login", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             } else {
+                // Jika gagal: Beritahu user bahwa email sudah digunakan
                 Toast.makeText(requireContext(), "Email sudah terdaftar!", Toast.LENGTH_SHORT).show()
             }
         }
-
+        // Event saat tombol Register diklik
         binding.buttonRegister.setOnClickListener {
             val name = binding.etNameSignup.text.toString().trim()
             val email = binding.etEmailSignup.text.toString().trim()

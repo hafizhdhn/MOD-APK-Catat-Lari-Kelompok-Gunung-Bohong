@@ -9,7 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.upn.catatlari.databinding.FragmentWelcomeBinding
 
 class WelcomeFragment : Fragment() {
-
+    // Menghubungkan layout XML fragment_welcome dengan kode Kotlin menggunakan View Binding
     private lateinit var binding: FragmentWelcomeBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -22,12 +22,12 @@ class WelcomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        // Event saat tombol Login diklik pindah ke halaman LoginFragment
         binding.btnLogin.setOnClickListener {
             findNavController().navigate(
                 WelcomeFragmentDirections.actionWelcomeFragmentToLoginFragment())
         }
-
+        // Event saat tombol Signup diklik pindah ke halaman RegisterFragment
         binding.btnSignup.setOnClickListener {
             findNavController().navigate(
                 WelcomeFragmentDirections.actionWelcomeFragmentToRegisterFragment()

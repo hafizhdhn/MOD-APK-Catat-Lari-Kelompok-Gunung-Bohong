@@ -16,6 +16,7 @@ abstract class RunDatabase : RoomDatabase() {
     abstract fun runDao(): RunDao
     abstract fun userDao(): UserDao
 
+    //Singleton Pattern: Fungsi untuk menjamin hanya ada satu objek database yang aktif
     companion object {
         @Volatile
         private var INSTANCE: RunDatabase? = null

@@ -5,10 +5,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
-@Parcelize
-@Entity(tableName = "user_table")
+@Parcelize //Memungkinkan objek User dikirim antar halaman (Activity/Fragment) dengan mudah.
+@Entity(tableName = "user_table") //Menandakan bahwa kelas ini akan menjadi tabel di database Room dengan nama "user_table"
 data class User(
-    @PrimaryKey
+    @PrimaryKey //Menjadikan email sebagai kunci utama (identitas unik), tidak boleh ada email yang sama
     val email: String,
     val name: String,
     val password: String

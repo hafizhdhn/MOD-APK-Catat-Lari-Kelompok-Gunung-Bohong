@@ -20,7 +20,7 @@ import java.util.Locale
 import java.util.TimeZone
 
 class AddRunFragment : Fragment() {
-
+    // Menghubungkan layout XML fragment_add_run dengan kode Kotlin
     private lateinit var binding: FragmentAddRunBinding
     private val runViewModel: RunViewModel by activityViewModels()
 
@@ -48,12 +48,14 @@ class AddRunFragment : Fragment() {
         }
     }
 
+    // Menampilkan kalender untuk memilih tanggal
     private fun showDatePicker() {
         val datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText("Pilih Tanggal Lari")
             .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
             .build()
 
+        // Aksi setelah user menekan tombol "OK" pada kalender
         datePicker.addOnPositiveButtonClickListener { selection ->
             val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
             calendar.timeInMillis = selection
@@ -64,6 +66,7 @@ class AddRunFragment : Fragment() {
         datePicker.show(parentFragmentManager, "DATE_PICKER")
     }
 
+    // Menampilkan pemilih waktu untuk menentukan durasi lari
     private fun showTimePicker() {
         val timePicker = MaterialTimePicker.Builder()
             .setTimeFormat(TimeFormat.CLOCK_24H)
@@ -72,6 +75,7 @@ class AddRunFragment : Fragment() {
             .setTitleText("Pilih Durasi (Jam:Menit)")
             .build()
 
+        // Format hasil input menjadi string "HH:mm"
         timePicker.addOnPositiveButtonClickListener {
             val formattedTime = String.format(Locale.getDefault(), "%02d:%02d", timePicker.hour, timePicker.minute)
             binding.etRunDuration.setText(formattedTime)
@@ -80,6 +84,7 @@ class AddRunFragment : Fragment() {
         timePicker.show(parentFragmentManager, "TIME_PICKER")
     }
 
+    // Fungsi untuk memvalidasi dan mengirim data ke ViewModel
     private fun saveRun() {
         val date = binding.etDate.text.toString()
         val distanceStr = binding.etRunDistance.text.toString()
