@@ -1,9 +1,10 @@
 // File: auth_provider.dart
 // Provider untuk autentikasi — menyimpan daftar akun terdaftar dan user yang sedang login
-// Menggantikan UserProvider agar login/register benar-benar tervalidasi
+// Akun disimpan ke SQLite via DatabaseHelper agar persist setelah app dimatikan
 
 import 'package:flutter/foundation.dart';
 
+import '../database/database_helper.dart';
 import '../models/user_model.dart';
 import '../utils/auth_state.dart';
 
@@ -17,34 +18,21 @@ class AkunTerdaftar {
 }
 
 /// AuthProvider mengelola autentikasi: daftar akun, login, register, dan logout.
-/// Saat login berhasil, [currentUser] diisi dan [AuthState.masuk()] dipanggil
-/// agar GoRouter mengizinkan akses ke halaman dalam aplikasi.
+///
+/// Flow data:
+/// 1. [initialize()] dipanggil di main() sebelum runApp — load semua akun dari DB
+/// 2. Akun demo di-seed ke DB jika belum ada
+/// 3. [login()] membaca dari memori (sudah di-load saat init)
+/// 4. [register()] menyimpan ke DB dan memori sekaligus
+/// 5. [logout()] hanya hapus currentUser dari memori
 class AuthProvider extends ChangeNotifier {
-  // Daftar semua akun yang sudah terdaftar (email unik sebagai identifier)
+  final DatabaseHelper _db = DatabaseHelper();
+
+  // Daftar semua akun yang sudah terdaftar (di-load dari DB saat initialize)
   final List<AkunTerdaftar> _daftarAkun = [];
 
   // User yang sedang aktif login — null jika belum login
   UserModel? _currentUser;
-
-  /// Konstruktor — inisialisasi dengan satu akun demo yang sudah terisi data
-  AuthProvider() {
-    _seedAkunDemo();
-  }
-
-  /// Menyiapkan akun demo bawaan untuk keperluan presentasi dan testing.
-  /// Akun ini sudah punya 5 aktivitas lari di AktivitasProvider.
-  void _seedAkunDemo() {
-    _daftarAkun.add(
-      const AkunTerdaftar(
-        user: UserModel(
-          id: 'demo_usr_001',
-          nama: 'Ahmad Pelari',
-          email: 'demo@catatlari.com',
-        ),
-        password: 'demo123',
-      ),
-    );
-  }
 
   // ===== GETTERS =====
 
@@ -53,6 +41,48 @@ class AuthProvider extends ChangeNotifier {
 
   /// true jika ada user yang sedang login
   bool get sudahLogin => _currentUser != null;
+
+  // ===== INISIALISASI =====
+
+  /// Memuat semua akun dari database SQLite ke memori.
+  ///
+  /// Dipanggil sekali di main() sebelum runApp.
+  /// Jika DB kosong (pertama kali install), seed akun demo terlebih dahulu.
+  Future<void> initialize() async {
+    final rows = await _db.getAllUsers();
+
+    if (rows.isEmpty) {
+      // Pertama kali: seed akun demo ke DB
+      await _db.insertUser({
+        DatabaseHelper.colUserId: 'demo_usr_001',
+        DatabaseHelper.colUserNama: 'Ahmad Pelari',
+        DatabaseHelper.colUserEmail: 'demo@catatlari.com',
+        DatabaseHelper.colUserPassword: 'demo123',
+      });
+      // Muat ulang setelah seed
+      final setelahSeed = await _db.getAllUsers();
+      _muatAkunDariRows(setelahSeed);
+    } else {
+      _muatAkunDariRows(rows);
+    }
+  }
+
+  /// Konversi baris database menjadi objek [AkunTerdaftar] dan simpan ke memori.
+  void _muatAkunDariRows(List<Map<String, dynamic>> rows) {
+    _daftarAkun.clear();
+    for (final row in rows) {
+      _daftarAkun.add(
+        AkunTerdaftar(
+          user: UserModel(
+            id: row[DatabaseHelper.colUserId] as String,
+            nama: row[DatabaseHelper.colUserNama] as String,
+            email: row[DatabaseHelper.colUserEmail] as String,
+          ),
+          password: row[DatabaseHelper.colUserPassword] as String,
+        ),
+      );
+    }
+  }
 
   // ===== METODE AUTENTIKASI =====
 
@@ -86,11 +116,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Mendaftarkan akun baru dengan nama, email, dan password.
+  ///
+  /// Menyimpan ke database SQLite secara sinkron (fire-and-forget),
+  /// kemudian langsung update memori agar UI tidak perlu menunggu DB.
   /// Mengembalikan null jika berhasil, atau pesan error jika gagal.
   String? register(String nama, String email, String password) {
     final emailBersih = email.trim().toLowerCase();
 
-    // Cek apakah email sudah terdaftar sebelumnya
+    // Cek apakah email sudah terdaftar sebelumnya (dari memori)
     final sudahAda = _daftarAkun.any(
       (a) => a.user.email.toLowerCase() == emailBersih,
     );
@@ -100,22 +133,25 @@ class AuthProvider extends ChangeNotifier {
     }
 
     // Buat akun baru dengan ID unik berbasis timestamp
-    _daftarAkun.add(
-      AkunTerdaftar(
-        user: UserModel(
-          id: 'usr_${DateTime.now().millisecondsSinceEpoch}',
-          nama: nama.trim(),
-          email: email.trim(),
-        ),
-        password: password,
-      ),
-    );
+    final id = 'usr_${DateTime.now().millisecondsSinceEpoch}';
+    final user = UserModel(id: id, nama: nama.trim(), email: email.trim());
+
+    // Simpan ke DB (async fire-and-forget — tidak perlu await di sini)
+    _db.insertUser({
+      DatabaseHelper.colUserId: id,
+      DatabaseHelper.colUserNama: nama.trim(),
+      DatabaseHelper.colUserEmail: email.trim(),
+      DatabaseHelper.colUserPassword: password,
+    });
+
+    // Update memori langsung agar UI responsif
+    _daftarAkun.add(AkunTerdaftar(user: user, password: password));
     notifyListeners();
     return null; // null = sukses
   }
 
-  /// Logout — hapus user aktif dan update flag GoRouter.
-  /// Data aktivitas user tetap tersimpan di AktivitasProvider (isolasi per-userId).
+  /// Logout — hapus user aktif dari memori dan update flag GoRouter.
+  /// Data aktivitas user tetap tersimpan di DB (isolasi per-userId).
   void logout() {
     _currentUser = null;
     AuthState.keluar();

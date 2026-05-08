@@ -1,67 +1,113 @@
 // File: aktivitas_provider.dart
 // Provider untuk mengelola state daftar aktivitas lari per-pengguna
-// Semua operasi CRUD dan statistik diisolasi berdasarkan userId
+// Data disimpan ke SQLite via DatabaseHelper agar persist antar sesi
 
 import 'package:flutter/foundation.dart';
+
+import '../database/database_helper.dart';
 import '../models/aktivitas_lari.dart';
 
 /// AktivitasProvider mengelola semua operasi CRUD untuk aktivitas lari.
-/// Data diisolasi per-user — setiap user hanya bisa melihat dan mengelola
-/// aktivitas miliknya sendiri (berdasarkan userId).
+///
+/// Flow data:
+/// 1. [initialize()] dipanggil di main() — load semua aktivitas dari DB
+/// 2. Data demo di-seed ke DB hanya jika belum ada (pertama install)
+/// 3. [tambah()], [perbarui()], [hapus()] update memori langsung + simpan ke DB
+///
+/// Pola write-through: UI diperbarui segera dari memori, DB diperbarui di belakang.
+/// Data diisolasi per-user — setiap getter memfilter berdasarkan userId.
 class AktivitasProvider extends ChangeNotifier {
+  final DatabaseHelper _db = DatabaseHelper();
+
   // Daftar semua aktivitas dari semua user — difilter saat dibaca
   final List<AktivitasLari> _aktivitas = [];
 
-  /// Konstruktor — inisialisasi dengan data demo untuk akun Ahmad Pelari
-  AktivitasProvider() {
-    _seedData();
+  // ===== INISIALISASI =====
+
+  /// Memuat semua aktivitas dari database SQLite ke memori.
+  ///
+  /// Dipanggil sekali di main() sebelum runApp.
+  /// Jika DB kosong, seed 5 aktivitas demo untuk akun 'demo_usr_001'.
+  Future<void> initialize() async {
+    final rows = await _db.getAllActivities();
+
+    if (rows.isEmpty) {
+      // Pertama kali: seed data demo ke DB
+      await _seedDataDemo();
+      // Muat ulang setelah seed
+      final setelahSeed = await _db.getAllActivities();
+      _muatAktivitasDariRows(setelahSeed);
+    } else {
+      _muatAktivitasDariRows(rows);
+    }
   }
 
-  /// Mengisi 5 data demo khusus untuk akun demo (id: 'demo_usr_001').
-  /// User baru tidak mendapat data awal — daftar aktivitasnya kosong.
-  void _seedData() {
-    _aktivitas.addAll([
-      AktivitasLari(
-        id: 'seed_1',
-        userId: 'demo_usr_001',
-        jarakKm: 5.2,
-        waktuMenit: 32,
-        tanggal: DateTime(2026, 5, 6),
-        catatan: 'Lari pagi yang menyegarkan',
-      ),
-      AktivitasLari(
-        id: 'seed_2',
-        userId: 'demo_usr_001',
-        jarakKm: 10.0,
-        waktuMenit: 65,
-        tanggal: DateTime(2026, 5, 4),
-        catatan: 'Lari kelompok — seru!',
-      ),
-      AktivitasLari(
-        id: 'seed_3',
-        userId: 'demo_usr_001',
-        jarakKm: 3.8,
-        waktuMenit: 22,
-        tanggal: DateTime(2026, 5, 2),
-        catatan: '',
-      ),
-      AktivitasLari(
-        id: 'seed_4',
-        userId: 'demo_usr_001',
-        jarakKm: 7.1,
-        waktuMenit: 44,
-        tanggal: DateTime(2026, 4, 30),
-        catatan: 'Latihan ringan sebelum lomba',
-      ),
-      AktivitasLari(
-        id: 'seed_5',
-        userId: 'demo_usr_001',
-        jarakKm: 8.5,
-        waktuMenit: 52,
-        tanggal: DateTime(2026, 4, 27),
-        catatan: 'Sesi akhir pekan bersama tim',
-      ),
-    ]);
+  /// Konversi baris database menjadi objek [AktivitasLari] dan simpan ke memori.
+  void _muatAktivitasDariRows(List<Map<String, dynamic>> rows) {
+    _aktivitas.clear();
+    for (final row in rows) {
+      _aktivitas.add(
+        AktivitasLari(
+          id: row[DatabaseHelper.colActId] as String,
+          userId: row[DatabaseHelper.colActUserId] as String,
+          jarakKm: (row[DatabaseHelper.colActJarak] as num).toDouble(),
+          waktuMenit: row[DatabaseHelper.colActWaktu] as int,
+          tanggal: DateTime.parse(row[DatabaseHelper.colActTanggal] as String),
+          catatan: row[DatabaseHelper.colActCatatan] as String? ?? '',
+        ),
+      );
+    }
+  }
+
+  /// Menyisipkan 5 aktivitas demo ke DB untuk akun Ahmad Pelari.
+  /// Dipanggil hanya sekali saat install pertama.
+  Future<void> _seedDataDemo() async {
+    final demoData = [
+      {
+        DatabaseHelper.colActId: 'seed_1',
+        DatabaseHelper.colActUserId: 'demo_usr_001',
+        DatabaseHelper.colActJarak: 5.2,
+        DatabaseHelper.colActWaktu: 32,
+        DatabaseHelper.colActTanggal: DateTime(2026, 5, 6).toIso8601String(),
+        DatabaseHelper.colActCatatan: 'Lari pagi yang menyegarkan',
+      },
+      {
+        DatabaseHelper.colActId: 'seed_2',
+        DatabaseHelper.colActUserId: 'demo_usr_001',
+        DatabaseHelper.colActJarak: 10.0,
+        DatabaseHelper.colActWaktu: 65,
+        DatabaseHelper.colActTanggal: DateTime(2026, 5, 4).toIso8601String(),
+        DatabaseHelper.colActCatatan: 'Lari kelompok — seru!',
+      },
+      {
+        DatabaseHelper.colActId: 'seed_3',
+        DatabaseHelper.colActUserId: 'demo_usr_001',
+        DatabaseHelper.colActJarak: 3.8,
+        DatabaseHelper.colActWaktu: 22,
+        DatabaseHelper.colActTanggal: DateTime(2026, 5, 2).toIso8601String(),
+        DatabaseHelper.colActCatatan: '',
+      },
+      {
+        DatabaseHelper.colActId: 'seed_4',
+        DatabaseHelper.colActUserId: 'demo_usr_001',
+        DatabaseHelper.colActJarak: 7.1,
+        DatabaseHelper.colActWaktu: 44,
+        DatabaseHelper.colActTanggal: DateTime(2026, 4, 30).toIso8601String(),
+        DatabaseHelper.colActCatatan: 'Latihan ringan sebelum lomba',
+      },
+      {
+        DatabaseHelper.colActId: 'seed_5',
+        DatabaseHelper.colActUserId: 'demo_usr_001',
+        DatabaseHelper.colActJarak: 8.5,
+        DatabaseHelper.colActWaktu: 52,
+        DatabaseHelper.colActTanggal: DateTime(2026, 4, 27).toIso8601String(),
+        DatabaseHelper.colActCatatan: 'Sesi akhir pekan bersama tim',
+      },
+    ];
+
+    for (final data in demoData) {
+      await _db.insertActivity(data);
+    }
   }
 
   // ===== GETTERS PER-USER =====
@@ -116,27 +162,52 @@ class AktivitasProvider extends ChangeNotifier {
 
   // ===== METODE CRUD =====
 
-  /// CREATE — Menambahkan aktivitas baru ke daftar.
-  /// notifyListeners() memberitahu semua Consumer untuk rebuild.
+  /// CREATE — Menambahkan aktivitas baru ke memori dan menyimpan ke DB.
+  ///
+  /// Memori diperbarui dulu agar UI langsung responsif (write-through).
+  /// DB diperbarui secara async di belakang layar.
   void tambah(AktivitasLari aktivitas) {
     _aktivitas.add(aktivitas);
     notifyListeners();
+
+    // Simpan ke DB secara async — tidak perlu await (fire-and-forget)
+    _db.insertActivity(_aktivitasKeMap(aktivitas));
   }
 
-  /// UPDATE — Memperbarui aktivitas yang sudah ada berdasarkan ID.
-  /// Mencari aktivitas dengan ID yang sama, lalu menggantinya.
+  /// UPDATE — Memperbarui aktivitas di memori dan di DB berdasarkan ID.
   void perbarui(AktivitasLari aktivitasBaru) {
     final indeks = _aktivitas.indexWhere((a) => a.id == aktivitasBaru.id);
     if (indeks != -1) {
       _aktivitas[indeks] = aktivitasBaru;
       notifyListeners();
+
+      // Perbarui di DB secara async
+      _db.updateActivity(_aktivitasKeMap(aktivitasBaru));
     }
   }
 
-  /// DELETE — Menghapus aktivitas berdasarkan ID, hanya jika userId cocok.
+  /// DELETE — Menghapus aktivitas dari memori dan DB berdasarkan ID.
+  ///
   /// Pemeriksaan ganda (id + userId) mencegah user A menghapus data user B.
   void hapus(String id, String userId) {
     _aktivitas.removeWhere((a) => a.id == id && a.userId == userId);
     notifyListeners();
+
+    // Hapus dari DB secara async
+    _db.deleteActivity(id);
+  }
+
+  // ===== HELPER =====
+
+  /// Mengonversi objek [AktivitasLari] menjadi Map untuk operasi DB.
+  Map<String, dynamic> _aktivitasKeMap(AktivitasLari a) {
+    return {
+      DatabaseHelper.colActId: a.id,
+      DatabaseHelper.colActUserId: a.userId,
+      DatabaseHelper.colActJarak: a.jarakKm,
+      DatabaseHelper.colActWaktu: a.waktuMenit,
+      DatabaseHelper.colActTanggal: a.tanggal.toIso8601String(),
+      DatabaseHelper.colActCatatan: a.catatan,
+    };
   }
 }

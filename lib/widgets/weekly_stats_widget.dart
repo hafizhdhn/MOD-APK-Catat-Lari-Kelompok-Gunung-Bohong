@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/aktivitas_lari.dart';
+import '../utils/app_constants.dart';
 
 /// WeeklyStatsWidget menampilkan ringkasan statistik aktivitas lari
 /// dalam 7 hari terakhir (termasuk hari ini).
@@ -27,11 +28,7 @@ class WeeklyStatsWidget extends StatelessWidget {
     final sekarang = DateTime.now();
     // Hitung batas awal: 6 hari yang lalu, mulai tengah malam
     final awalMinggu = sekarang.subtract(const Duration(days: 6));
-    final batasAwal = DateTime(
-      awalMinggu.year,
-      awalMinggu.month,
-      awalMinggu.day,
-    );
+    final batasAwal = DateTime(awalMinggu.year, awalMinggu.month, awalMinggu.day);
     // Filter aktivitas yang tanggalnya tidak lebih awal dari batasAwal
     return daftarAktivitas.where((a) => !a.tanggal.isBefore(batasAwal)).toList();
   }
@@ -66,14 +63,21 @@ class WeeklyStatsWidget extends StatelessWidget {
     final waktu = _waktuMingguIni;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.paddingKonten,
+        AppSizes.paddingKartu,
+        AppSizes.paddingKonten,
+        0,
+      ),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSizes.paddingKartu),
         decoration: BoxDecoration(
           // Latar dengan warna secondary container semi-transparan
           color: colorScheme.secondaryContainer.withAlpha(128),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorScheme.secondary.withAlpha(77)),
+          borderRadius: BorderRadius.circular(AppSizes.radiusKartu),
+          border: Border.all(
+            color: colorScheme.secondary.withAlpha(AppColors.alphaOverlaySedang),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,14 +87,14 @@ class WeeklyStatsWidget extends StatelessWidget {
               children: [
                 Icon(
                   Icons.date_range_rounded,
-                  size: 16,
+                  size: AppSizes.ikonKartu,
                   color: colorScheme.secondary,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSizes.paddingTerkecil),
                 Text(
-                  'Minggu Ini (7 Hari Terakhir)',
+                  AppStrings.mingguIni,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: AppSizes.teksSedang,
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSecondaryContainer,
                   ),
@@ -98,15 +102,18 @@ class WeeklyStatsWidget extends StatelessWidget {
                 const Spacer(),
                 // Badge jumlah sesi — ditampilkan di kanan header
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.paddingTerkecil,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: colorScheme.secondary.withAlpha(51),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSizes.paddingKecil),
                   ),
                   child: Text(
                     '$sesi sesi',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: AppSizes.teksMini,
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSecondaryContainer,
                     ),
@@ -115,14 +122,14 @@ class WeeklyStatsWidget extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSizes.paddingKecil),
 
             // ===== STATISTIK TIGA KOLOM: Jarak | Waktu | Aktivitas =====
             Row(
               children: [
                 Expanded(
                   child: _buildMiniStat(
-                    label: 'Jarak',
+                    label: AppStrings.jarak,
                     nilai: '${jarak.toStringAsFixed(1)} km',
                     colorScheme: colorScheme,
                   ),
@@ -131,11 +138,11 @@ class WeeklyStatsWidget extends StatelessWidget {
                 Container(
                   height: 30,
                   width: 1,
-                  color: colorScheme.secondary.withAlpha(77),
+                  color: colorScheme.secondary.withAlpha(AppColors.alphaOverlaySedang),
                 ),
                 Expanded(
                   child: _buildMiniStat(
-                    label: 'Waktu',
+                    label: AppStrings.waktu,
                     nilai: _formatWaktu(waktu),
                     colorScheme: colorScheme,
                   ),
@@ -143,7 +150,7 @@ class WeeklyStatsWidget extends StatelessWidget {
                 Container(
                   height: 30,
                   width: 1,
-                  color: colorScheme.secondary.withAlpha(77),
+                  color: colorScheme.secondary.withAlpha(AppColors.alphaOverlaySedang),
                 ),
                 Expanded(
                   child: _buildMiniStat(
@@ -176,7 +183,7 @@ class WeeklyStatsWidget extends StatelessWidget {
         Text(
           nilai,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: AppSizes.teksNormal,
             fontWeight: FontWeight.bold,
             color: colorScheme.onSecondaryContainer,
           ),
@@ -186,8 +193,10 @@ class WeeklyStatsWidget extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontSize: 11,
-            color: colorScheme.onSecondaryContainer.withAlpha(153),
+            fontSize: AppSizes.teksMini,
+            color: colorScheme.onSecondaryContainer.withAlpha(
+              AppColors.alphaTeksSekunder,
+            ),
           ),
         ),
       ],

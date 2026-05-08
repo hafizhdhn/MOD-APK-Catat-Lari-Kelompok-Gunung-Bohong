@@ -16,19 +16,30 @@ import 'providers/auth_provider.dart';
 import 'providers/aktivitas_provider.dart';
 
 /// Fungsi main adalah titik masuk pertama yang dijalankan saat aplikasi dibuka.
-void main() {
-  // Pastikan binding Flutter sudah siap sebelum menjalankan aplikasi
+///
+/// Provider dibuat manual di sini agar [initialize()] bisa di-await sebelum
+/// [runApp] dipanggil — memastikan data dari DB sudah tersedia saat UI pertama kali dirender.
+void main() async {
+  // Pastikan binding Flutter sudah siap sebelum mengakses platform channel (DB)
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Buat provider di luar runApp agar bisa di-await
+  final authProvider = AuthProvider();
+  final aktivitasProvider = AktivitasProvider();
+
+  // Muat data dari SQLite sebelum UI dirender
+  // Urutan penting: auth dulu karena aktivitas butuh user_id dari akun yang di-seed
+  await authProvider.initialize();
+  await aktivitasProvider.initialize();
 
   // MultiProvider membungkus seluruh aplikasi agar semua screen
   // bisa mengakses provider yang terdaftar via context.read/watch
   runApp(
     MultiProvider(
       providers: [
-        // Provider autentikasi: daftar akun, user aktif, login/register/logout
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        // Provider daftar aktivitas lari + operasi CRUD
-        ChangeNotifierProvider(create: (_) => AktivitasProvider()),
+        // Gunakan .value karena instance sudah dibuat dan di-init di atas
+        ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider.value(value: aktivitasProvider),
       ],
       child: const CatatLariApp(),
     ),

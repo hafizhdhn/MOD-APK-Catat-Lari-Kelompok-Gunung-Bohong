@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/aktivitas_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/app_constants.dart';
 import '../../utils/app_routes.dart';
 
 /// ProfileScreen menampilkan profil pengguna yang sedang login.
@@ -33,12 +34,12 @@ class ProfileScreen extends StatelessWidget {
           backgroundColor: colorScheme.surfaceContainerLowest,
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            title: const Text('Profil Saya'),
+            title: const Text(AppStrings.judulProfil),
             actions: [
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
                 onPressed: () {},
-                tooltip: 'Edit Profil',
+                tooltip: AppStrings.editProfil,
               ),
             ],
           ),
@@ -48,22 +49,22 @@ class ProfileScreen extends StatelessWidget {
                 // ===== HEADER: foto + nama + email dari AuthProvider =====
                 _buildHeaderProfil(nama, email, colorScheme),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSizes.paddingKonten),
 
                 // ===== STATISTIK: dihitung dari AktivitasProvider per-user =====
                 _buildStatistikKeseluruhan(aktivitasProvider, colorScheme, userId),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSizes.paddingKonten),
 
                 // ===== BADGE PENCAPAIAN =====
                 _buildPencapaian(aktivitasProvider, colorScheme, userId),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSizes.paddingKonten),
 
                 // ===== MENU PENGATURAN =====
                 _buildMenuPengaturan(context, colorScheme),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSizes.paddingKonten),
 
                 // ===== TOMBOL KELUAR =====
                 _buildTombolKeluar(context, colorScheme),
@@ -77,6 +78,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun header profil berisi avatar dengan inisial, nama, email, dan badge kelompok.
   Widget _buildHeaderProfil(
     String nama,
     String email,
@@ -99,23 +101,29 @@ class ProfileScreen extends StatelessWidget {
           colors: [colorScheme.primary, colorScheme.primaryContainer],
         ),
       ),
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.paddingKonten,
+        AppSizes.paddingHalamanH,
+        AppSizes.paddingKonten,
+        32,
+      ),
       child: Column(
         children: [
           Stack(
             alignment: Alignment.bottomRight,
             children: [
+              // Avatar lingkaran besar dengan inisial nama
               Container(
-                width: 100,
-                height: 100,
+                width: AppSizes.ukuranAvatarBesar,
+                height: AppSizes.ukuranAvatarBesar,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: colorScheme.primaryContainer,
-                  border: Border.all(color: Colors.white, width: 3),
+                  border: Border.all(color: AppColors.overlay, width: 3),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withAlpha(51),
-                      blurRadius: 15,
+                      color: AppColors.bayangan.withAlpha(AppColors.alphaOverlayLemah),
+                      blurRadius: AppSizes.blurBayanganBesar,
                       offset: const Offset(0, 5),
                     ),
                   ],
@@ -131,23 +139,24 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              // Tombol kamera kecil di pojok kanan bawah avatar
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: colorScheme.secondary,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
+                  border: Border.all(color: AppColors.overlay, width: 2),
                 ),
                 child: Icon(
                   Icons.camera_alt_rounded,
-                  size: 14,
+                  size: AppSizes.ikonKecil,
                   color: colorScheme.onSecondary,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSizes.paddingKartu),
 
           // Nama lengkap dari AuthProvider
           Text(
@@ -165,29 +174,35 @@ class ProfileScreen extends StatelessWidget {
           Text(
             email,
             style: TextStyle(
-              fontSize: 14,
-              color: colorScheme.onPrimary.withAlpha(204),
+              fontSize: AppSizes.teksSedang,
+              color: colorScheme.onPrimary.withAlpha(AppColors.alphaTeksNormal),
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSizes.paddingKecil),
 
+          // Badge nama kelompok
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.paddingKecil,
+              vertical: 6,
+            ),
             decoration: BoxDecoration(
-              color: Colors.white.withAlpha(51),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withAlpha(102)),
+              color: AppColors.overlay.withAlpha(AppColors.alphaOverlayLemah),
+              borderRadius: BorderRadius.circular(AppSizes.radiusBadge),
+              border: Border.all(
+                color: AppColors.overlay.withAlpha(AppColors.alphaPemisah),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.group_rounded, size: 14, color: colorScheme.onPrimary),
+                Icon(Icons.group_rounded, size: AppSizes.ikonKecil, color: colorScheme.onPrimary),
                 const SizedBox(width: 6),
                 Text(
-                  'Kelompok Gunung Bohong',
+                  AppStrings.namaKelompok,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppSizes.teksLabel,
                     color: colorScheme.onPrimary,
                     fontWeight: FontWeight.w500,
                   ),
@@ -207,15 +222,15 @@ class ProfileScreen extends StatelessWidget {
     String userId,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingKonten),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSizes.paddingKonten),
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSizes.radiusKartu),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(10),
+              color: AppColors.bayangan.withAlpha(AppColors.alphaBayanganHalus),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -225,27 +240,26 @@ class ProfileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Pencapaian Keseluruhan',
+              AppStrings.pencapaianKeseluruhan,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppSizes.teksNormal,
                 fontWeight: FontWeight.bold,
                 color: colorScheme.onSurface,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSizes.paddingKartu),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildItemStatistik(
                   nilai: provider.getTotalJarakKmByUser(userId).toStringAsFixed(1),
                   satuan: 'km',
-                  label: 'Total Jarak',
+                  label: AppStrings.totalJarak,
                   ikon: Icons.route_rounded,
                   warnaPrimary: colorScheme.primary,
                   colorScheme: colorScheme,
                 ),
-                Container(
-                    height: 50, width: 1, color: colorScheme.outlineVariant),
+                Container(height: 50, width: 1, color: colorScheme.outlineVariant),
                 _buildItemStatistik(
                   nilai: '${provider.getTotalSesiByUser(userId)}',
                   satuan: 'sesi',
@@ -254,14 +268,13 @@ class ProfileScreen extends StatelessWidget {
                   warnaPrimary: colorScheme.tertiary,
                   colorScheme: colorScheme,
                 ),
-                Container(
-                    height: 50, width: 1, color: colorScheme.outlineVariant),
+                Container(height: 50, width: 1, color: colorScheme.outlineVariant),
                 _buildItemStatistik(
                   nilai: '${provider.getTotalKaloriByUser(userId)}',
                   satuan: 'kal',
-                  label: 'Kalori',
+                  label: AppStrings.kalori,
                   ikon: Icons.local_fire_department_outlined,
-                  warnaPrimary: Colors.orange,
+                  warnaPrimary: AppColors.kalori,
                   colorScheme: colorScheme,
                 ),
               ],
@@ -272,6 +285,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun satu item statistik berbentuk ikon + nilai + satuan + label.
   Widget _buildItemStatistik({
     required String nilai,
     required String satuan,
@@ -285,19 +299,19 @@ class ProfileScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: warnaPrimary.withAlpha(26),
+            color: warnaPrimary.withAlpha(AppColors.alphaLatarIkon),
             shape: BoxShape.circle,
           ),
           child: Icon(ikon, color: warnaPrimary, size: 22),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSizes.paddingTerkecil),
         RichText(
           text: TextSpan(
             children: [
               TextSpan(
                 text: nilai,
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: AppSizes.teksSub,
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
                 ),
@@ -305,15 +319,19 @@ class ProfileScreen extends StatelessWidget {
               TextSpan(
                 text: ' $satuan',
                 style: TextStyle(
-                    fontSize: 12, color: colorScheme.onSurfaceVariant),
+                  fontSize: AppSizes.teksLabel,
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
         ),
         Text(
           label,
-          style:
-              TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+          style: TextStyle(
+            fontSize: AppSizes.teksLabel,
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -330,37 +348,37 @@ class ProfileScreen extends StatelessWidget {
 
     final daftarBadge = [
       {
-        'label': '5K Pertama',
+        'label': AppStrings.badge5k,
         'ikon': Icons.emoji_events_rounded,
         'tercapai': totalJarak >= 5,
       },
       {
-        'label': '10K Club',
+        'label': AppStrings.badge10k,
         'ikon': Icons.workspace_premium_rounded,
         'tercapai': totalJarak >= 10,
       },
       {
-        'label': '5 Sesi',
+        'label': AppStrings.badge5Sesi,
         'ikon': Icons.military_tech_rounded,
         'tercapai': totalSesi >= 5,
       },
       {
-        'label': '10 Sesi',
+        'label': AppStrings.badge10Sesi,
         'ikon': Icons.calendar_month_rounded,
         'tercapai': totalSesi >= 10,
       },
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingKonten),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSizes.paddingKonten),
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSizes.radiusKartu),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(10),
+              color: AppColors.bayangan.withAlpha(AppColors.alphaBayanganHalus),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -370,14 +388,14 @@ class ProfileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Badge & Pencapaian',
+              AppStrings.badgePencapaian,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: AppSizes.teksNormal,
                 fontWeight: FontWeight.bold,
                 color: colorScheme.onSurface,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSizes.paddingKartu),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: daftarBadge.map((badge) {
@@ -397,7 +415,7 @@ class ProfileScreen extends StatelessWidget {
                         badge['ikon'] as IconData,
                         color: tercapai
                             ? colorScheme.primary
-                            : colorScheme.onSurfaceVariant.withAlpha(102),
+                            : colorScheme.onSurfaceVariant.withAlpha(AppColors.alphaPemisah),
                         size: 28,
                       ),
                     ),
@@ -405,12 +423,11 @@ class ProfileScreen extends StatelessWidget {
                     Text(
                       badge['label'] as String,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: AppSizes.teksMini,
                         color: tercapai
                             ? colorScheme.onSurface
-                            : colorScheme.onSurfaceVariant.withAlpha(153),
-                        fontWeight:
-                            tercapai ? FontWeight.w600 : FontWeight.normal,
+                            : colorScheme.onSurfaceVariant.withAlpha(AppColors.alphaTeksSekunder),
+                        fontWeight: tercapai ? FontWeight.w600 : FontWeight.normal,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -424,11 +441,12 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  /// Membangun daftar menu pengaturan dalam container kartu
   Widget _buildMenuPengaturan(BuildContext context, ColorScheme colorScheme) {
     final daftarMenu = [
       {
         'ikon': Icons.person_outline_rounded,
-        'judul': 'Edit Profil',
+        'judul': AppStrings.editProfil,
         'subjudul': 'Ubah nama, foto, dan data diri',
       },
       {
@@ -449,19 +467,19 @@ class ProfileScreen extends StatelessWidget {
       {
         'ikon': Icons.info_outline_rounded,
         'judul': 'Tentang Aplikasi',
-        'subjudul': 'Versi 1.0.0 - Catat Lari',
+        'subjudul': 'Versi 1.0.0 - ${AppStrings.namaApp}',
       },
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingKonten),
       child: Container(
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSizes.radiusKartu),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(10),
+              color: AppColors.bayangan.withAlpha(AppColors.alphaBayanganHalus),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -475,30 +493,36 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 ListTile(
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
+                    horizontal: AppSizes.paddingKartu,
                     vertical: 4,
                   ),
                   leading: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppSizes.paddingTerkecil),
                     decoration: BoxDecoration(
                       color: colorScheme.primaryContainer.withAlpha(128),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusKecil + 2),
                     ),
-                    child: Icon(menu['ikon'] as IconData,
-                        color: colorScheme.primary, size: 20),
+                    child: Icon(
+                      menu['ikon'] as IconData,
+                      color: colorScheme.primary,
+                      size: AppSizes.ikonStandar,
+                    ),
                   ),
                   title: Text(
                     menu['judul'] as String,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w500, fontSize: 15),
+                    style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                   ),
                   subtitle: Text(
                     menu['subjudul'] as String,
                     style: TextStyle(
-                        fontSize: 12, color: colorScheme.onSurfaceVariant),
+                      fontSize: AppSizes.teksLabel,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                  trailing: Icon(Icons.chevron_right_rounded,
-                      color: colorScheme.onSurfaceVariant),
+                  trailing: Icon(
+                    Icons.chevron_right_rounded,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                   onTap: () {},
                 ),
                 if (!isLast)
@@ -515,26 +539,24 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  /// Membangun tombol keluar dengan dialog konfirmasi
+  /// Membangun tombol keluar dengan dialog konfirmasi sebelum logout
   Widget _buildTombolKeluar(BuildContext context, ColorScheme colorScheme) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingKonten),
       child: OutlinedButton.icon(
         onPressed: () {
           showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: const Text('Keluar dari Akun'),
-              content: const Text(
-                'Apakah Anda yakin ingin keluar dari aplikasi?',
-              ),
+              title: const Text(AppStrings.keluarDariAkun),
+              content: const Text(AppStrings.konfirmasiKeluar),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppSizes.radiusKartu),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('Batal'),
+                  child: const Text(AppStrings.tombolBatal),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -549,7 +571,7 @@ class ProfileScreen extends StatelessWidget {
                     // 3. Kembali ke login — GoRouter redirect memblokir akses tanpa login
                     context.go(AppRoutes.login);
                   },
-                  child: const Text('Keluar'),
+                  child: const Text(AppStrings.tombolKeluar),
                 ),
               ],
             ),
@@ -559,12 +581,13 @@ class ProfileScreen extends StatelessWidget {
           foregroundColor: colorScheme.error,
           side: BorderSide(color: colorScheme.error),
           minimumSize: const Size(double.infinity, 52),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSizes.radiusButton),
+          ),
         ),
         icon: const Icon(Icons.logout_rounded),
         label: const Text(
-          'Keluar dari Akun',
+          AppStrings.keluarDariAkun,
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
       ),

@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../models/aktivitas_lari.dart';
 import '../../providers/aktivitas_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/app_constants.dart';
 import '../../utils/app_routes.dart';
 import '../../widgets/activity_card.dart';
 import '../../widgets/stats_card.dart';
@@ -89,9 +90,14 @@ class HomeScreen extends StatelessWidget {
                 // ===== 3. LABEL "STATISTIK KESELURUHAN" =====
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSizes.paddingKonten,
+                      AppSizes.paddingKonten,
+                      AppSizes.paddingKonten,
+                      0,
+                    ),
                     child: Text(
-                      'Statistik Keseluruhan',
+                      AppStrings.statistikKeseluruhan,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -109,12 +115,17 @@ class HomeScreen extends StatelessWidget {
                 // ===== 5. HEADER "AKTIVITAS TERKINI" + BADGE JUMLAH =====
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 4, 8),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSizes.paddingKonten,
+                      AppSizes.paddingHalamanH,
+                      4,
+                      AppSizes.paddingTerkecil,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Aktivitas Terkini',
+                          AppStrings.aktivitasTerkini,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -125,15 +136,17 @@ class HomeScreen extends StatelessWidget {
                         if (daftarAktivitas.isNotEmpty)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(AppSizes.radiusBadge),
                             ),
                             child: Text(
                               '${daftarAktivitas.length} sesi',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: AppSizes.teksLabel,
                                 color: colorScheme.onPrimaryContainer,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -153,7 +166,12 @@ class HomeScreen extends StatelessWidget {
                 else
                   // Tampilkan daftar AktivitasCard menggunakan widget yang diekstrak
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 120),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSizes.paddingKonten,
+                      0,
+                      AppSizes.paddingKonten,
+                      120,
+                    ),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -172,13 +190,13 @@ class HomeScreen extends StatelessWidget {
                                   .hapus(aktivitas.id, userId);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content:
-                                      const Text('Aktivitas berhasil dihapus'),
+                                  content: const Text(AppStrings.aktivitasDihapus),
                                   behavior: SnackBarBehavior.floating,
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.error,
+                                  backgroundColor: colorScheme.error,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(
+                                      AppSizes.radiusSnackbar,
+                                    ),
                                   ),
                                 ),
                               );
@@ -199,7 +217,7 @@ class HomeScreen extends StatelessWidget {
             onPressed: () => _tampilkanForm(context),
             icon: const Icon(Icons.add_rounded),
             label: const Text(
-              'Catat Lari',
+              AppStrings.fabCatatLari,
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
@@ -220,8 +238,8 @@ class HomeScreen extends StatelessWidget {
       title: Row(
         children: [
           Icon(Icons.directions_run_rounded, color: colorScheme.onPrimary),
-          const SizedBox(width: 8),
-          const Text('Catat Lari'),
+          const SizedBox(width: AppSizes.paddingTerkecil),
+          const Text(AppStrings.namaApp),
         ],
       ),
       actions: [
@@ -234,9 +252,9 @@ class HomeScreen extends StatelessWidget {
         GestureDetector(
           onTap: () => context.go(AppRoutes.profile),
           child: Container(
-            margin: const EdgeInsets.only(right: 16),
+            margin: const EdgeInsets.only(right: AppSizes.paddingKartu),
             child: CircleAvatar(
-              radius: 18,
+              radius: AppSizes.radiusAvatarKecil,
               backgroundColor: colorScheme.primaryContainer,
               child: Text(
                 inisial,
@@ -274,7 +292,12 @@ class HomeScreen extends StatelessWidget {
           colors: [colorScheme.primary, colorScheme.tertiary],
         ),
       ),
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 36),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.paddingHalamanH,
+        AppSizes.paddingHalamanH,
+        AppSizes.paddingHalamanH,
+        36,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -282,7 +305,7 @@ class HomeScreen extends StatelessWidget {
           Text(
             'Halo, $namaDepan! 👋',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: AppSizes.teksHeading,
               fontWeight: FontWeight.bold,
               color: colorScheme.onPrimary,
             ),
@@ -290,30 +313,30 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 4),
           // Pesan motivasi — berbeda tergantung apakah sudah ada aktivitas
           Text(
-            totalSesi == 0
-                ? 'Mulai catat lari pertamamu hari ini!'
-                : 'Terus semangat berlari!',
+            totalSesi == 0 ? AppStrings.pesanAjakan : AppStrings.pesanMotivasi,
             style: TextStyle(
-              fontSize: 14,
-              color: colorScheme.onPrimary.withAlpha(204),
+              fontSize: AppSizes.teksSedang,
+              color: colorScheme.onPrimary.withAlpha(AppColors.alphaTeksNormal),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSizes.paddingKonten),
 
           // Kartu ringkasan tiga statistik utama di dalam banner
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSizes.paddingKartu),
             decoration: BoxDecoration(
               // Latar putih transparan agar terlihat di atas gradien
-              color: Colors.white.withAlpha(51),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withAlpha(77)),
+              color: AppColors.overlay.withAlpha(AppColors.alphaOverlayLemah),
+              borderRadius: BorderRadius.circular(AppSizes.radiusKartu),
+              border: Border.all(
+                color: AppColors.overlay.withAlpha(AppColors.alphaOverlaySedang),
+              ),
             ),
             child: Row(
               children: [
                 Expanded(
                   child: _buildRingkasanItem(
-                    label: 'Total Jarak',
+                    label: AppStrings.totalJarak,
                     nilai: provider.getTotalJarakFormattedByUser(userId),
                     ikon: Icons.route_rounded,
                     warna: colorScheme.onPrimary,
@@ -322,11 +345,11 @@ class HomeScreen extends StatelessWidget {
                 Container(
                   height: 40,
                   width: 1,
-                  color: Colors.white.withAlpha(102),
+                  color: AppColors.overlay.withAlpha(AppColors.alphaPemisah),
                 ),
                 Expanded(
                   child: _buildRingkasanItem(
-                    label: 'Total Sesi',
+                    label: AppStrings.totalSesi,
                     nilai: '${totalSesi}x',
                     ikon: Icons.flag_rounded,
                     warna: colorScheme.onPrimary,
@@ -335,11 +358,11 @@ class HomeScreen extends StatelessWidget {
                 Container(
                   height: 40,
                   width: 1,
-                  color: Colors.white.withAlpha(102),
+                  color: AppColors.overlay.withAlpha(AppColors.alphaPemisah),
                 ),
                 Expanded(
                   child: _buildRingkasanItem(
-                    label: 'Avg Pace',
+                    label: AppStrings.avgPace,
                     nilai: provider.getAvgPaceFormattedByUser(userId),
                     ikon: Icons.speed_rounded,
                     warna: colorScheme.onPrimary,
@@ -364,12 +387,12 @@ class HomeScreen extends StatelessWidget {
   }) {
     return Column(
       children: [
-        Icon(ikon, color: warna.withAlpha(204), size: 20),
+        Icon(ikon, color: warna.withAlpha(AppColors.alphaTeksNormal), size: AppSizes.ikonStandar),
         const SizedBox(height: 4),
         Text(
           nilai,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: AppSizes.teksNormal,
             fontWeight: FontWeight.bold,
             color: warna,
           ),
@@ -377,8 +400,8 @@ class HomeScreen extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontSize: 11,
-            color: warna.withAlpha(178),
+            fontSize: AppSizes.teksMini,
+            color: warna.withAlpha(AppColors.alphaTeksIkon),
           ),
         ),
       ],
@@ -398,21 +421,26 @@ class HomeScreen extends StatelessWidget {
     final totalWaktuMenit = provider.getTotalWaktuMenitByUser(userId);
 
     return SizedBox(
-      height: 110,
+      height: AppSizes.tinggiScrollStat,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+        padding: const EdgeInsets.fromLTRB(
+          AppSizes.paddingKonten,
+          AppSizes.paddingKecil,
+          AppSizes.paddingKonten,
+          0,
+        ),
         children: [
           // Kartu Jarak
           StatsCard(
-            label: 'Jarak',
+            label: AppStrings.jarak,
             nilai: provider.getTotalJarakFormattedByUser(userId),
             ikon: Icons.map_outlined,
             warna: colorScheme.primary,
           ),
           // Kartu Waktu — format jam+menit jika >= 60 menit
           StatsCard(
-            label: 'Waktu',
+            label: AppStrings.waktu,
             nilai: totalWaktuMenit >= 60
                 ? '${totalWaktuMenit ~/ 60}j ${totalWaktuMenit % 60}m'
                 : '${totalWaktuMenit}m',
@@ -421,14 +449,14 @@ class HomeScreen extends StatelessWidget {
           ),
           // Kartu Kalori — warna oranye untuk kesan "panas"
           StatsCard(
-            label: 'Kalori',
+            label: AppStrings.kalori,
             nilai: '${provider.getTotalKaloriByUser(userId)}',
             ikon: Icons.local_fire_department_outlined,
-            warna: Colors.orange,
+            warna: AppColors.kalori,
           ),
           // Kartu Sesi
           StatsCard(
-            label: 'Sesi',
+            label: AppStrings.sesi,
             nilai: '${provider.getTotalSesiByUser(userId)}x',
             ikon: Icons.repeat_rounded,
             warna: colorScheme.secondary,
@@ -451,43 +479,43 @@ class HomeScreen extends StatelessWidget {
           children: [
             // Ikon ilustrasi besar di lingkaran
             Container(
-              width: 100,
-              height: 100,
+              width: AppSizes.ukuranAvatarBesar,
+              height: AppSizes.ukuranAvatarBesar,
               decoration: BoxDecoration(
                 color: colorScheme.primaryContainer.withAlpha(128),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.directions_run_rounded,
-                size: 50,
-                color: colorScheme.primary.withAlpha(153),
+                size: AppSizes.ikonBesar,
+                color: colorScheme.primary.withAlpha(AppColors.alphaTeksSekunder),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSizes.paddingKonten),
             Text(
-              'Belum Ada Aktivitas',
+              AppStrings.belumAdaAktivitas,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: colorScheme.onSurface,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSizes.paddingTerkecil),
             Text(
-              'Ketuk tombol "Catat Lari" di bawah\nuntuk mencatat sesi lari pertamamu!',
+              AppStrings.pesanEmptyAktivitas,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: AppSizes.teksSedang,
                 color: colorScheme.onSurfaceVariant,
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSizes.paddingHalamanH),
             // Tombol shortcut — alternatif selain menekan FAB
             FilledButton.icon(
               onPressed: () => _tampilkanForm(context),
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Catat Lari Sekarang'),
+              label: const Text(AppStrings.catatLariSekarang),
             ),
           ],
         ),

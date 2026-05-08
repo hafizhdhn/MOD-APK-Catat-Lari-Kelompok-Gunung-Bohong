@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../models/aktivitas_lari.dart';
 import '../../providers/aktivitas_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/app_constants.dart';
 
 /// FormAktivitas adalah form untuk operasi CREATE dan UPDATE aktivitas lari.
 /// Jika [aktivitasYangDiEdit] diisi → mode EDIT (form pre-filled).
@@ -85,7 +86,7 @@ class _FormAktivitasState extends State<FormAktivitas> {
       lastDate: DateTime.now(),
       helpText: 'Pilih Tanggal Lari',
       confirmText: 'Pilih',
-      cancelText: 'Batal',
+      cancelText: AppStrings.tombolBatal,
     );
 
     // Update state hanya jika pengguna benar-benar memilih tanggal
@@ -107,10 +108,15 @@ class _FormAktivitasState extends State<FormAktivitas> {
 
     // Validasi tambahan: durasi harus lebih dari 0
     if (totalMenit <= 0) {
+      final colorScheme = Theme.of(context).colorScheme;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Durasi harus lebih dari 0 menit'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: const Text(AppStrings.validasiDurasi),
+          backgroundColor: colorScheme.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSizes.radiusSnackbar),
+          ),
         ),
       );
       return;
@@ -156,7 +162,9 @@ class _FormAktivitasState extends State<FormAktivitas> {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSizes.radiusSnackbar),
+        ),
       ),
     );
 
@@ -195,7 +203,12 @@ class _FormAktivitasState extends State<FormAktivitas> {
       ),
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+          padding: const EdgeInsets.fromLTRB(
+            AppSizes.paddingHalamanH,
+            AppSizes.paddingKecil,
+            AppSizes.paddingHalamanH,
+            AppSizes.paddingHalamanH,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
@@ -207,7 +220,7 @@ class _FormAktivitasState extends State<FormAktivitas> {
                   child: Container(
                     width: 40,
                     height: 4,
-                    margin: const EdgeInsets.only(bottom: 20),
+                    margin: const EdgeInsets.only(bottom: AppSizes.paddingKonten),
                     decoration: BoxDecoration(
                       color: colorScheme.outlineVariant,
                       borderRadius: BorderRadius.circular(2),
@@ -219,10 +232,10 @@ class _FormAktivitasState extends State<FormAktivitas> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(AppSizes.paddingTerkecil),
                       decoration: BoxDecoration(
                         color: colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(AppSizes.radiusKecil + 2),
                       ),
                       child: Icon(
                         Icons.directions_run_rounded,
@@ -230,12 +243,14 @@ class _FormAktivitasState extends State<FormAktivitas> {
                         size: 22,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSizes.paddingKecil),
                     Text(
                       // Judul berubah tergantung mode (tambah atau edit)
-                      _isEditMode ? 'Edit Aktivitas' : 'Catat Aktivitas Lari',
+                      _isEditMode
+                          ? AppStrings.judulFormEdit
+                          : AppStrings.judulFormTambah,
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: AppSizes.teksSub,
                         fontWeight: FontWeight.bold,
                         color: colorScheme.onSurface,
                       ),
@@ -243,40 +258,44 @@ class _FormAktivitasState extends State<FormAktivitas> {
                   ],
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSizes.paddingHalamanH),
 
                 // ===== PILIH TANGGAL =====
                 Text(
                   'Tanggal',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: AppSizes.teksKecil,
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSizes.paddingTerkecil),
                 // Tombol yang menampilkan tanggal terpilih dan membuka date picker
                 InkWell(
                   onTap: _pilihTanggal,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSizes.radiusButton),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
+                      horizontal: AppSizes.paddingKartu,
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
-                      border: Border.all(color: colorScheme.outline.withAlpha(128)),
-                      borderRadius: BorderRadius.circular(12),
-                      color: colorScheme.surfaceContainerHighest.withAlpha(77),
+                      border: Border.all(
+                        color: colorScheme.outline.withAlpha(128),
+                      ),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusButton),
+                      color: colorScheme.surfaceContainerHighest.withAlpha(
+                        AppColors.alphaOverlaySedang,
+                      ),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.calendar_today_rounded,
-                          size: 18,
+                          size: AppSizes.ikonKartu,
                           color: colorScheme.primary,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSizes.paddingKecil),
                         Text(
                           _formatTanggal(_tanggalDipilih),
                           style: TextStyle(
@@ -294,18 +313,18 @@ class _FormAktivitasState extends State<FormAktivitas> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSizes.paddingKonten),
 
                 // ===== INPUT JARAK =====
                 Text(
                   'Jarak (km)',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: AppSizes.teksKecil,
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSizes.paddingTerkecil),
                 TextFormField(
                   controller: _jarakController,
                   // Keyboard angka dengan desimal
@@ -314,9 +333,9 @@ class _FormAktivitasState extends State<FormAktivitas> {
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'[\d.,]')),
                   ],
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Contoh: 5.2',
-                    prefixIcon: const Icon(Icons.route_rounded),
+                    prefixIcon: Icon(Icons.route_rounded),
                     suffixText: 'km',
                   ),
                   // Validasi: jarak tidak boleh kosong dan harus > 0
@@ -332,18 +351,18 @@ class _FormAktivitasState extends State<FormAktivitas> {
                   },
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSizes.paddingKonten),
 
                 // ===== INPUT DURASI (JAM + MENIT) =====
                 Text(
                   'Durasi',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: AppSizes.teksKecil,
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSizes.paddingTerkecil),
                 Row(
                   children: [
                     // Field jam — opsional (boleh kosong/0 untuk lari < 1 jam)
@@ -369,7 +388,7 @@ class _FormAktivitasState extends State<FormAktivitas> {
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSizes.paddingKecil),
 
                     // Field menit — wajib diisi setidaknya salah satu (jam atau menit)
                     Expanded(
@@ -396,18 +415,18 @@ class _FormAktivitasState extends State<FormAktivitas> {
                   ],
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSizes.paddingKonten),
 
                 // ===== CATATAN OPSIONAL =====
                 Text(
                   'Catatan (opsional)',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: AppSizes.teksKecil,
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSizes.paddingTerkecil),
                 TextFormField(
                   controller: _catatanController,
                   // Izinkan banyak baris untuk catatan panjang
@@ -424,7 +443,7 @@ class _FormAktivitasState extends State<FormAktivitas> {
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSizes.paddingTerkecil),
 
                 // ===== TOMBOL AKSI =====
                 Row(
@@ -436,14 +455,14 @@ class _FormAktivitasState extends State<FormAktivitas> {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppSizes.radiusButton),
                           ),
                         ),
-                        child: const Text('Batal'),
+                        child: const Text(AppStrings.tombolBatal),
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSizes.paddingKecil),
 
                     // Tombol Simpan — menjalankan _simpan()
                     Expanded(
@@ -453,7 +472,7 @@ class _FormAktivitasState extends State<FormAktivitas> {
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppSizes.radiusButton),
                           ),
                         ),
                         // Tampilkan spinner saat loading, ikon saat normal
@@ -467,10 +486,12 @@ class _FormAktivitasState extends State<FormAktivitas> {
                                 _isEditMode
                                     ? Icons.check_rounded
                                     : Icons.save_rounded,
-                                size: 18,
+                                size: AppSizes.ikonKartu,
                               ),
                         label: Text(
-                          _isEditMode ? 'Perbarui' : 'Simpan',
+                          _isEditMode
+                              ? AppStrings.tombolPerbarui
+                              : AppStrings.tombolSimpan,
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),

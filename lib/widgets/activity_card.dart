@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/aktivitas_lari.dart';
+import '../utils/app_constants.dart';
 
 /// AktivitasCard menampilkan satu sesi lari dalam format kartu interaktif.
 ///
@@ -69,8 +70,10 @@ class AktivitasCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Hapus Aktivitas?'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSizes.radiusKartu),
+        ),
+        title: const Text(AppStrings.judulDialogHapus),
         content: Text(
           'Aktivitas lari ${aktivitas.jarakFormatted} pada '
           '${_formatTanggalSingkat(aktivitas.tanggal)} akan dihapus permanen.',
@@ -79,7 +82,7 @@ class AktivitasCard extends StatelessWidget {
           // Tombol batal — tutup dialog tanpa menghapus apa pun
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Batal'),
+            child: const Text(AppStrings.tombolBatal),
           ),
           // Tombol hapus — tutup dialog, lalu delegasikan hapus ke parent
           ElevatedButton(
@@ -91,7 +94,7 @@ class AktivitasCard extends StatelessWidget {
               Navigator.of(ctx).pop(); // Tutup dialog konfirmasi
               onHapus(); // Beri tahu parent untuk melakukan hapus + snackbar
             },
-            child: const Text('Hapus'),
+            child: const Text(AppStrings.tombolHapus),
           ),
         ],
       ),
@@ -103,14 +106,14 @@ class AktivitasCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppSizes.paddingKecil),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSizes.radiusKartu),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 8,
+            color: AppColors.bayangan.withAlpha(AppColors.alphaBayanganHalus),
+            blurRadius: AppSizes.blurBayangan,
             offset: const Offset(0, 2),
           ),
         ],
@@ -119,7 +122,12 @@ class AktivitasCard extends StatelessWidget {
         children: [
           // ===== BARIS ATAS: tanggal + badge + menu popup =====
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 8, 0),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.paddingKartu,
+              AppSizes.paddingKecil,
+              AppSizes.paddingTerkecil,
+              0,
+            ),
             child: Row(
               children: [
                 // Tanggal aktivitas dalam format panjang (kiri)
@@ -127,7 +135,7 @@ class AktivitasCard extends StatelessWidget {
                   child: Text(
                     _formatTanggalPanjang(aktivitas.tanggal),
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: AppSizes.teksKecil,
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
@@ -135,24 +143,27 @@ class AktivitasCard extends StatelessWidget {
 
                 // Badge kategori aktivitas — selalu "Lari" di app ini
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.paddingTerkecil,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppSizes.radiusBadge),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         Icons.directions_run_rounded,
-                        size: 12,
+                        size: AppSizes.ikonMini,
                         color: colorScheme.onPrimaryContainer,
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Lari',
+                        AppStrings.badgeLari,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: AppSizes.teksMini,
                           color: colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.w600,
                         ),
@@ -166,10 +177,10 @@ class AktivitasCard extends StatelessWidget {
                   icon: Icon(
                     Icons.more_vert_rounded,
                     color: colorScheme.onSurfaceVariant,
-                    size: 20,
+                    size: AppSizes.ikonStandar,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSizes.paddingKecil),
                   ),
                   onSelected: (nilai) {
                     if (nilai == 'edit') {
@@ -187,7 +198,7 @@ class AktivitasCard extends StatelessWidget {
                       child: Row(
                         children: [
                           Icon(Icons.edit_outlined,
-                              size: 18, color: colorScheme.primary),
+                              size: AppSizes.ikonKartu, color: colorScheme.primary),
                           const SizedBox(width: 10),
                           const Text('Edit'),
                         ],
@@ -199,9 +210,9 @@ class AktivitasCard extends StatelessWidget {
                       child: Row(
                         children: [
                           Icon(Icons.delete_outline_rounded,
-                              size: 18, color: colorScheme.error),
+                              size: AppSizes.ikonKartu, color: colorScheme.error),
                           const SizedBox(width: 10),
-                          Text('Hapus',
+                          Text(AppStrings.tombolHapus,
                               style: TextStyle(color: colorScheme.error)),
                         ],
                       ),
@@ -214,14 +225,19 @@ class AktivitasCard extends StatelessWidget {
 
           // ===== BARIS STATISTIK: Jarak, Durasi, Pace, Kalori =====
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.paddingKartu,
+              AppSizes.paddingKecil,
+              AppSizes.paddingKartu,
+              AppSizes.paddingKartu,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildDetailStat(
                   ikon: Icons.route_rounded,
                   nilai: aktivitas.jarakFormatted,
-                  label: 'Jarak',
+                  label: AppStrings.jarak,
                   colorScheme: colorScheme,
                 ),
                 _buildDetailStat(
@@ -239,7 +255,7 @@ class AktivitasCard extends StatelessWidget {
                 _buildDetailStat(
                   ikon: Icons.local_fire_department_outlined,
                   nilai: aktivitas.kaloriFormatted,
-                  label: 'Kalori',
+                  label: AppStrings.kalori,
                   colorScheme: colorScheme,
                 ),
               ],
@@ -250,12 +266,17 @@ class AktivitasCard extends StatelessWidget {
           if (aktivitas.catatan.isNotEmpty)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+              padding: const EdgeInsets.fromLTRB(
+                AppSizes.paddingKartu,
+                0,
+                AppSizes.paddingKartu,
+                AppSizes.paddingKecil + 2,
+              ),
               child: Row(
                 children: [
                   Icon(
                     Icons.notes_rounded,
-                    size: 14,
+                    size: AppSizes.ikonKecil,
                     color: colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 6),
@@ -263,7 +284,7 @@ class AktivitasCard extends StatelessWidget {
                     child: Text(
                       aktivitas.catatan,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: AppSizes.teksLabel,
                         color: colorScheme.onSurfaceVariant,
                         fontStyle: FontStyle.italic,
                       ),
@@ -292,13 +313,13 @@ class AktivitasCard extends StatelessWidget {
     return Column(
       children: [
         // Ikon kecil berwarna primary
-        Icon(ikon, size: 16, color: colorScheme.primary),
+        Icon(ikon, size: AppSizes.ikonKecil + 2, color: colorScheme.primary),
         const SizedBox(height: 4),
         // Nilai statistik dengan font tebal
         Text(
           nilai,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: AppSizes.teksKecil,
             fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,
           ),
@@ -307,7 +328,7 @@ class AktivitasCard extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: AppSizes.teksMini,
             color: colorScheme.onSurfaceVariant,
           ),
         ),

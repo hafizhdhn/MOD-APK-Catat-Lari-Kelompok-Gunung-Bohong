@@ -41,6 +41,12 @@ dependencies:
   # Package state management untuk berbagi data antar widget/screen
   provider: ^6.1.2
 
+  # SQLite database untuk persistensi data (setara Room di Android)
+  sqflite: ^2.3.2
+
+  # Helper untuk mendapatkan path direktori database di device
+  path: ^1.9.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
